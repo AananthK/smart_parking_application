@@ -17,7 +17,7 @@ FOR i in 1..50 LOOP
 END LOOP;
 
 -- Populating Lot 2 (Lindsy Ave. Roadside Parking)
-FOR i in 1..20 LOOP
+FOR i in 1..35 LOOP
 
 	-- For Regular Parking
 	INSERT INTO parking_spot (lot_id, spot_number, spot_type, status)
@@ -26,7 +26,7 @@ FOR i in 1..20 LOOP
 END LOOP;
 
 -- Populating Lot 3 (City Bakery Parking)
-FOR i in 1..10 LOOP
+FOR i in 1..20 LOOP
 
 	-- For Reserved Parking
 	IF i < 3 THEN

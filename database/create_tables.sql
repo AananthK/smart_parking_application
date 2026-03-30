@@ -25,7 +25,7 @@ CREATE TABLE lot (
 -- =========================================
 CREATE TABLE vehicle (
     driver_id SERIAL PRIMARY KEY,
-    license_plate VARCHAR(11) NOT NULL UNIQUE,
+    license_plate VARCHAR(11) NOT NULL,
     access_key_hash VARCHAR(255),
     owner_name VARCHAR(100),
 	vehicle_type VARCHAR(4) NOT NULL DEFAULT 'TEST'
@@ -38,6 +38,12 @@ CREATE TABLE vehicle (
 	-- 'SUSPENDED' vehicles are no longer registered driver_id and license plate 
 	-- 		(incase license plate changers or different driver for same car) 
 );
+
+-- Partial Index: An index that applies to some rows based on a condition
+-- Only one ACTIVE vehicle per license plate
+CREATE UNIQUE INDEX uq_active_license_plate
+ON vehicle (license_plate)
+WHERE status = 'ACTIVE';
 
 -- =========================================
 -- PARKING_SPOT
