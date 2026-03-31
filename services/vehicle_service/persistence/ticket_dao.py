@@ -35,7 +35,7 @@ def view_all_tickets_by_driver_id_dao(driver_id: int):
     return record
 
 # persistence function to get all tickets for driver (for operational purposes)
-def get_all_tickets_by_driver_id(driver_id: int):
+def get_all_tickets_by_driver_id_dao(driver_id: int):
     sql = """SELECT ticket_id 
              FROM tickets 
              WHERE driver_id = %s
@@ -49,8 +49,8 @@ def get_all_tickets_by_driver_id(driver_id: int):
     return record
 
 # persistence function to a ticket by ticket_id
-def get_ticket_by_ticket_id(ticket_id: int):
-    sql = """SELECT ticket_id 
+def get_ticket_by_ticket_id_dao(ticket_id: int):
+    sql = """SELECT * 
              FROM tickets 
              WHERE ticket_id = %s
              """
@@ -63,7 +63,7 @@ def get_ticket_by_ticket_id(ticket_id: int):
     return record
 
 # persistence function to get all unpaid tickets for driver
-def get_all_unpaid_tickets_by_driver_id(driver_id: int):
+def get_all_unpaid_tickets_by_driver_id_dao(driver_id: int):
     sql = """SELECT ticket_id 
              FROM tickets 
              WHERE driver_id = %s AND status = %s

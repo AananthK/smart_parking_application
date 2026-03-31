@@ -19,6 +19,7 @@ from typing import Optional
 import secrets
 import string
 
+
 def register_vehicle(license_plate: str, owner_name: Optional[str] = None):
 
     license_plate = license_plate.strip().upper()
@@ -88,8 +89,14 @@ def pay_ticket(license_plate: str, access_key: str, ticket_id: int):
 
     vehicle = authenticate_vehicle(license_plate = license_plate, access_key = access_key)
     
-    if ticket_exists(ticket_id = ticket_id) is None:
+    t = ticket_exists(ticket_id = ticket_id)
+
+    if t is None:
         raise ValueError("Ticket does not exist")
+    elif t['status'] == 'PAID':
+        raise ValueError("Ticket already paid")
+    elif t['status'] == 'CANCELLED':
+        raise ValueError("Ticket cancelled. Cannot pay.")
     
     ticket = pay_ticket_dao(ticket_id = ticket_id, driver_id = vehicle['driver_id'])
 
@@ -99,8 +106,14 @@ def cancel_ticket(license_plate: str, access_key: str, ticket_id: int):
 
     vehicle = authenticate_vehicle(license_plate = license_plate, access_key = access_key)
     
-    if ticket_exists(ticket_id = ticket_id) is None:
+    t = ticket_exists(ticket_id = ticket_id)
+
+    if t is None:
         raise ValueError("Ticket does not exist")
+    elif t['status'] == 'CANCELLED':
+        raise ValueError("Ticket already cancelled")
+    elif t['status'] == 'PAID':
+        raise ValueError("Ticket paid. Cannot cancel.")
 
     ticket = cancel_ticket_dao(ticket_id = ticket_id, driver_id = vehicle['driver_id'])
 
