@@ -69,6 +69,20 @@ def get_all_free_parking_spots_in_lot_dao(lot_id: int):
     
     return record
 
+# persistence function to get all parking spots in a lot (all statuses)
+def get_all_spots_in_lot_dao(lot_id: int):
+    sql = """SELECT spot_id, spot_number, spot_type, status, current_vehicle
+             FROM parking_spot
+             WHERE lot_id = %s
+             ORDER BY spot_number"""
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, (lot_id,))
+            record = cur.fetchall()
+
+    return record
+
 #----- UPDATE -----
 # persistence function to occupy parking spots
 def occupy_parking_spot_dao(spot_id: int, driver_id: int):

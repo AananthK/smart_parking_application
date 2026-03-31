@@ -1,74 +1,64 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional
 
 from business.vehicle_service import (
     register_vehicle,
     suspend_vehicle,
     view_tickets,
-    pay_ticket,
-    cancel_ticket
 )
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# ---------- Health ----------
+
+# ── Health ────────────────────────────────────────────────────────────────────
 
 @app.get("/health")
 def health():
     return {"status": "running"}
 
 
-# ---------- Vehicle ----------
+# ── Vehicles ──────────────────────────────────────────────────────────────────
 
-@app.post("/vehicle/register")
-def register_vehicle_endpoint(license_plate: str, owner_name: str = None):
+class RegisterRequest(BaseModel):
+    license_plate: str
+    owner_name: Optional[str] = None
+
+@app.post("/vehicles/register")
+def register_vehicle_endpoint(req: RegisterRequest):
     try:
-        key = register_vehicle(license_plate=license_plate, owner_name=owner_name)
-        return {
-            "license_plate": license_plate.strip().upper(),
-            "access_key": key
-        }
+        return register_vehicle(license_plate=req.license_plate, owner_name=req.owner_name)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/vehicle/suspend")
-def suspend_vehicle_endpoint(license_plate: str, access_key: str):
+class SuspendRequest(BaseModel):
+    license_plate: str
+    access_key: str
+
+@app.post("/vehicles/suspend")
+def suspend_vehicle_endpoint(req: SuspendRequest):
     try:
-        return suspend_vehicle(license_plate=license_plate, access_key=access_key)
+        suspend_vehicle(license_plate=req.license_plate, access_key=req.access_key)
+        return {"message": "Vehicle suspended successfully."}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-# ---------- Tickets ----------
+# ── Tickets ───────────────────────────────────────────────────────────────────
 
-@app.post("/tickets/view")
-def view_tickets_endpoint(license_plate: str, access_key: str):
+@app.get("/tickets")
+def get_tickets_endpoint(license_plate: str, access_key: str):
     try:
-        return view_tickets(license_plate=license_plate, access_key=access_key)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.post("/tickets/pay")
-def pay_ticket_endpoint(license_plate: str, access_key: str, ticket_id: int):
-    try:
-        return pay_ticket(
-            license_plate=license_plate,
-            access_key=access_key,
-            ticket_id=ticket_id
-        )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.post("/tickets/cancel")
-def cancel_ticket_endpoint(license_plate: str, access_key: str, ticket_id: int):
-    try:
-        return cancel_ticket(
-            license_plate=license_plate,
-            access_key=access_key,
-            ticket_id=ticket_id
-        )
+        tickets = view_tickets(license_plate=license_plate, access_key=access_key)
+        return {"tickets": tickets}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

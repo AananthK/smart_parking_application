@@ -4,3 +4,4 @@ dist-ssr/
 .env
 .env.local
 *.local
+src/api/mock.js

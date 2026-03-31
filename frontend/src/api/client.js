@@ -1,6 +1,9 @@
+import { mockGetLots, mockGetLotSpots } from './mock'
+
 // API base URL — set VITE_API_URL in .env to point at your backend
 // Vite proxy rewrites /api → http://localhost:8000 (see vite.config.js)
 const API_BASE = '/api'
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
 async function request(method, path, body = null, params = null) {
   let url = `${API_BASE}${path}`
@@ -46,12 +49,14 @@ export function suspendVehicle(license_plate, access_key) {
 // GET /lots
 //   → [{ lot_id, lot_name, lot_location, capacity, base_price, lot_status, available_count }]
 export function getLots() {
+  if (USE_MOCK) return mockGetLots()
   return request('GET', '/lots')
 }
 
 // GET /lots/:lot_id/spots
 //   → [{ spot_id, spot_number, spot_type, status, current_vehicle }]
 export function getLotSpots(lot_id) {
+  if (USE_MOCK) return mockGetLotSpots(lot_id)
   return request('GET', `/lots/${lot_id}/spots`)
 }
 

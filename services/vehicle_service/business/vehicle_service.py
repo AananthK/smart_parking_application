@@ -27,8 +27,8 @@ def register_vehicle(license_plate: str, owner_name: Optional[str] = None):
     if len(license_plate) > 11:
         raise ValueError("License Plate is 11 characters MAX.")
     
-    if not license_plate.isalnum(): # checks if license plate is only numbers and letters
-        raise ValueError("License plate can only be alphanumeric. No special characters")
+    if not license_plate.replace(' ', '').replace('-', '').isalnum():
+        raise ValueError("License plate can only contain letters, numbers, spaces, or hyphens.")
 
     if license_plate_taken(license_plate = license_plate):
         raise ValueError("License Plate is already registered.")
@@ -44,11 +44,11 @@ def register_vehicle(license_plate: str, owner_name: Optional[str] = None):
                 raise ValueError("Owner name is too large. 100 characters MAX.")
 
         # owner name if not defined (None) will be translated as 'NULL' in the DB
-        register_vehicle_dao(license_plate = license_plate, 
-                             access_key_hash = hash_key(key = key),
-                             owner_name = owner_name)
+        row = register_vehicle_dao(license_plate = license_plate,
+                                   access_key_hash = hash_key(key = key),
+                                   owner_name = owner_name)
 
-        return key
+        return {"driver_id": row["driver_id"], "license_plate": row["license_plate"], "access_key": key}
     
 def authenticate_vehicle(license_plate: str, access_key: str):
     license_plate = license_plate.strip().upper()
